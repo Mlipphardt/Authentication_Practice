@@ -1,7 +1,8 @@
 const express = require("express");
 const bodyparser = require("body-parser");
 const session = require("express-session");
-const passport = require("./config/passort.js");
+const passport = require("./config/passport");
+const db = require("./models");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -43,6 +44,13 @@ app.get("/profile", function (req, res) {
   res.render("profile");
 });
 
-app.listen(3000, function () {
-  console.log("The server is alive and listening!");
+app.get("/logout", function (req, res) {
+  req.logout();
+  res.redirect("/login");
+});
+
+db.sequelize.sync().then(function () {
+  app.listen(3000, function () {
+    console.log("The server is alive and listening!");
+  });
 });

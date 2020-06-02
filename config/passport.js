@@ -10,7 +10,7 @@ passport.use(
     password,
     done
   ) {
-    User.findOne({ where: { email: email } }).then(function (err, user) {
+    db.User.findOne({ where: { email: email } }).then(function (err, user) {
       if (err) {
         return done(err);
       }
