@@ -29,21 +29,18 @@ passport.use(
 
 //login handler
 passport.use(
-  "local",
+  "local-signin",
   new LocalStrategy({ usernameField: "email" }, function (
-    username,
+    email,
     password,
     done
   ) {
-    User.findOne({ username: username }, function (err, user) {
-      if (err) {
-        return done(err);
-      }
+    User.findOne({ where: { email: email } }).then(function (err, user) {
       if (!user) {
-        return done(null, false);
+        return done(null, false), { message: "Email incorrect" };
       }
       if (!user.verifyPassword(password)) {
-        return done(null, false);
+        return done(null, false, { message: "Password incorrect" });
       }
       return done(null, user);
     });
@@ -55,7 +52,7 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (user, done) {
-  done(err, user);
+  done(null, user);
 });
 
 module.exports = passport;

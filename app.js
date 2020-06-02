@@ -4,13 +4,22 @@ const session = require("express-session");
 const passport = require("./config/passport");
 const db = require("./models");
 
+function isAuthenticated(req, res, next) {
+  if (req.user) {
+    next();
+  }
+  return res.redirect("/login");
+}
+
 const app = express();
 app.set("view engine", "ejs");
 
 // middleware
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
-session({ secret: "some secret", resave: false, saveUninitialized: true });
+app.use(
+  session({ secret: "some secret", resave: false, saveUninitialized: true })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -22,7 +31,7 @@ app.get("/login", function (req, res) {
 
 app.post(
   "/login",
-  passport.authenticate("local", {
+  passport.authenticate("local-signin", {
     successRedirect: "/profile",
     failureRedirect: "/login",
   })
@@ -40,7 +49,7 @@ app.post(
   })
 );
 
-app.get("/profile", function (req, res) {
+app.get("/profile", isAuthenticated, function (req, res) {
   res.render("profile");
 });
 
